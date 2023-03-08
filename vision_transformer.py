@@ -107,10 +107,13 @@ class EncoderBlock(nn.Module):
         self.ln_2 = norm_layer(hidden_dim)
         self.mlp = MLPBlock(hidden_dim, mlp_dim, dropout)
 
+        self.attn_output_weights = None
+
     def forward(self, input: torch.Tensor):
         torch._assert(input.dim() == 3, f"Expected (batch_size, seq_length, hidden_dim) got {input.shape}")
         x = self.ln_1(input)
-        x, _ = self.self_attention(x, x, x, need_weights=False)
+        x, attn_output_weights = self.self_attention(x, x, x, need_weights=True)
+        self.attn_output_weights = attn_output_weights
         x = self.dropout(x)
         x = x + input
 
@@ -616,7 +619,6 @@ class ViT_H_14_Weights(WeightsEnum):
     DEFAULT = IMAGENET1K_SWAG_E2E_V1
 
 
-@register_model()
 @handle_legacy_interface(weights=("pretrained", ViT_B_16_Weights.IMAGENET1K_V1))
 def vit_b_16(*, weights: Optional[ViT_B_16_Weights] = None, progress: bool = True, **kwargs: Any) -> VisionTransformer:
     """
@@ -650,7 +652,6 @@ def vit_b_16(*, weights: Optional[ViT_B_16_Weights] = None, progress: bool = Tru
     )
 
 
-@register_model()
 @handle_legacy_interface(weights=("pretrained", ViT_B_32_Weights.IMAGENET1K_V1))
 def vit_b_32(*, weights: Optional[ViT_B_32_Weights] = None, progress: bool = True, **kwargs: Any) -> VisionTransformer:
     """
@@ -684,7 +685,6 @@ def vit_b_32(*, weights: Optional[ViT_B_32_Weights] = None, progress: bool = Tru
     )
 
 
-@register_model()
 @handle_legacy_interface(weights=("pretrained", ViT_L_16_Weights.IMAGENET1K_V1))
 def vit_l_16(*, weights: Optional[ViT_L_16_Weights] = None, progress: bool = True, **kwargs: Any) -> VisionTransformer:
     """
@@ -718,7 +718,6 @@ def vit_l_16(*, weights: Optional[ViT_L_16_Weights] = None, progress: bool = Tru
     )
 
 
-@register_model()
 @handle_legacy_interface(weights=("pretrained", ViT_L_32_Weights.IMAGENET1K_V1))
 def vit_l_32(*, weights: Optional[ViT_L_32_Weights] = None, progress: bool = True, **kwargs: Any) -> VisionTransformer:
     """
@@ -752,7 +751,6 @@ def vit_l_32(*, weights: Optional[ViT_L_32_Weights] = None, progress: bool = Tru
     )
 
 
-@register_model()
 @handle_legacy_interface(weights=("pretrained", None))
 def vit_h_14(*, weights: Optional[ViT_H_14_Weights] = None, progress: bool = True, **kwargs: Any) -> VisionTransformer:
     """
