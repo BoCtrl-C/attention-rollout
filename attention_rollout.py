@@ -24,6 +24,20 @@ def imshow(img):
     plt.imshow(np.transpose(npimg, (1, 2, 0)))
     plt.show()
 
+def show_images(imgs, **kwargs):
+    """Shows the images provided.
+    """
+    
+    imgs = imgs.clone()
+
+    im = torchvision.utils.make_grid(imgs)
+
+    # show images
+    fig = plt.figure(**kwargs)
+    imshow(im)
+
+    return fig
+
 def show_attention(imgs, rollout, **kwargs):
     """Shows the images provided with the given attention masks.
     """
